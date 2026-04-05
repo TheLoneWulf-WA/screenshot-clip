@@ -1,0 +1,63 @@
+#!/bin/zsh
+
+# screenshot-clip installer
+# Sets up the launchd agent for auto-start on login
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLIST_NAME="com.screenshotclip.agent"
+PLIST_PATH="$HOME/Library/LaunchAgents/$PLIST_NAME.plist"
+BIN_PATH="$(command -v screenshot-clip 2>/dev/null || echo "$SCRIPT_DIR/screenshot-clip")"
+WATCH_DIR="${1:-$HOME/Desktop}"
+
+if [[ ! -f "$BIN_PATH" ]]; then
+    echo "Error: screenshot-clip not found. Install with: brew install screenshot-clip"
+    exit 1
+fi
+
+# Unload existing agent if present
+if launchctl list | grep -q "$PLIST_NAME" 2>/dev/null; then
+    launchctl unload "$PLIST_PATH" 2>/dev/null || true
+fi
+
+# Create the launchd plist
+cat << PLIST > "$PLIST_PATH"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>$PLIST_NAME</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$BIN_PATH</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>SCREENSHOT_CLIP_DIR</key>
+        <string>$WATCH_DIR</string>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/screenshot-clip.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/screenshot-clip.err</string>
+</dict>
+</plist>
+PLIST
+
+# Load the agent
+launchctl load "$PLIST_PATH"
+
+echo "screenshot-clip installed and running."
+echo "  Watching: $WATCH_DIR"
+echo "  Logs: /tmp/screenshot-clip.log"
+echo ""
+echo "To stop:    screenshot-clip-uninstall"
+echo "To change folder: screenshot-clip-install /path/to/folder"
