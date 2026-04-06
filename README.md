@@ -78,7 +78,11 @@ No Electron. No Swift app. No daemon eating your RAM. A few lines of shell doing
 | Environment variable | Default | Description |
 |---|---|---|
 | `SCREENSHOT_CLIP_DIR` | `~/Desktop` | Folder to watch |
-| `SCREENSHOT_CLIP_DELAY` | `0.1` | Seconds to wait before copying (lets file finish writing) |
+| `SCREENSHOT_CLIP_DELAY` | `0.3` | Seconds to wait before copying (lets file finish writing) |
+
+## Why not just use Cmd + Ctrl + Shift + 4?
+
+That shortcut copies your screenshot to the clipboard, but it doesn't save the file. You get the paste, but lose the artifact. screenshot-clip gives you both: the file saves to your Desktop as usual, and it's immediately on your clipboard. No compromise.
 
 ## Requirements
 
