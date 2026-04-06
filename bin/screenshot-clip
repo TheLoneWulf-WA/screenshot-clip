@@ -4,7 +4,7 @@
 # https://github.com/TheLoneWulf-WA/screenshot-clip
 
 WATCH_DIR="${SCREENSHOT_CLIP_DIR:-$HOME/Desktop}"
-SLEEP_DURATION="${SCREENSHOT_CLIP_DELAY:-0.1}"
+SLEEP_DURATION="${SCREENSHOT_CLIP_DELAY:-0.3}"
 
 if ! command -v fswatch &> /dev/null; then
     echo "Error: fswatch is required. Install it with: brew install fswatch"
@@ -13,14 +13,15 @@ fi
 
 echo "screenshot-clip: Watching $WATCH_DIR for new screenshots..."
 
-fswatch -0 --event Created "$WATCH_DIR" | while IFS= read -r -d '' file; do
-    if [[ "$file" == *.png ]]; then
+fswatch -0 "$WATCH_DIR" | while IFS= read -r -d '' file; do
+    filename=$(basename "$file")
+    if [[ "$filename" == *.png && "$filename" != .* ]]; then
         sleep "$SLEEP_DURATION"
         osascript -e "set the clipboard to (read (POSIX file \"$file\") as «class PNGf»)" 2>/dev/null
         if [[ $? -eq 0 ]]; then
-            echo "Copied to clipboard: $(basename "$file")"
+            echo "Copied to clipboard: $filename"
         else
-            echo "Failed to copy: $(basename "$file")"
+            echo "Failed to copy: $filename"
         fi
     fi
 done
