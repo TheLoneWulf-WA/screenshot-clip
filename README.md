@@ -80,6 +80,22 @@ No Electron. No Swift app. No daemon eating your RAM. A few lines of shell doing
 | `SCREENSHOT_CLIP_DIR` | `~/Desktop` | Folder to watch |
 | `SCREENSHOT_CLIP_DELAY` | `2.0` | Max seconds to wait for the file to finish writing before copying (poll-based; returns as soon as the file size is stable) |
 
+> **Upgrading from ≤ v1.0.2?** The `SCREENSHOT_CLIP_DELAY` default changed from `0.3` to `2.0`, and its meaning shifted from "always wait this long" to "max wait, return as soon as the file is stable." If you pinned it to a low value (e.g. `0.1`), unset it or raise it.
+
+## Still feels slow? Disable the floating thumbnail.
+
+If screenshots take ~3-5 seconds to land on your clipboard, it's not screenshot-clip — it's macOS. When the floating thumbnail is enabled (the preview that appears in the bottom-right corner after each screenshot), **macOS holds the screenshot in memory and doesn't write the file to disk until the thumbnail dismisses.** screenshot-clip can't copy what isn't on disk yet.
+
+To make screenshots land on your clipboard instantly:
+
+1. Press `Cmd + Shift + 5`
+2. Click **Options**
+3. Uncheck **Show Floating Thumbnail**
+
+Now screenshots write to disk immediately and screenshot-clip copies in ~100ms.
+
+If you want to keep the thumbnail (it's useful for inline annotation), just single-click it after taking a screenshot — that dismisses the preview and writes the file on demand.
+
 ## Why not just use Cmd + Ctrl + Shift + 4?
 
 That shortcut copies your screenshot to the clipboard, but it doesn't save the file. You get the paste, but lose the artifact. screenshot-clip gives you both: the file saves to your Desktop as usual, and it's immediately on your clipboard. No compromise.

@@ -10,7 +10,7 @@ screenshot-clip is a macOS-only shell utility that automatically copies screensh
 
 Three shell scripts, no build step:
 
-- **`bin/screenshot-clip`** — Main loop. Uses `fswatch` to watch a directory for new `.png` files, then copies each to the clipboard via `osascript`. Skips hidden files (macOS creates temp `.Screenshot` files before renaming to the final name). Waits for the file to finish writing by polling `stat -f %z` every 50ms until the size is stable across two consecutive reads (capped by `SCREENSHOT_CLIP_DELAY`, default `2.0s`). Configured via `SCREENSHOT_CLIP_DIR` (default `~/Desktop`) and `SCREENSHOT_CLIP_DELAY` (max wait timeout).
+- **`bin/screenshot-clip`** — Main loop. Uses `fswatch` to watch a directory for new `.png` files, then copies each to the clipboard via `osascript`. Skips hidden files (macOS creates temp `.Screenshot` files before renaming to the final name). Waits for the file to finish writing by polling `stat -f %z` every 50ms until the size is stable across two consecutive reads (capped by `SCREENSHOT_CLIP_DELAY`, default `2.0s`). Dedups multiple fswatch fires for the same screenshot by `filename + mtime` so a single screenshot only triggers one clipboard copy. Configured via `SCREENSHOT_CLIP_DIR` (default `~/Desktop`) and `SCREENSHOT_CLIP_DELAY` (max wait timeout).
 - **`bin/screenshot-clip-install`** — Generates and loads a macOS `launchd` plist (`~/Library/LaunchAgents/com.screenshotclip.agent.plist`) so the watcher runs at login. Accepts an optional directory argument. Sets PATH in the plist so `fswatch` is found by launchd.
 - **`bin/screenshot-clip-uninstall`** — Unloads and removes the launchd plist.
 - **`Formula/screenshot-clip.rb`** — Homebrew formula (tap: `TheLoneWulf-WA/tools`). Depends on `fswatch`.
@@ -51,3 +51,4 @@ Logs go to `/tmp/screenshot-clip.log`, errors to `/tmp/screenshot-clip.err`.
 - Only handles `.png` files
 - Must skip hidden (dot) files — macOS writes screenshots as hidden temp files first, then renames
 - `fswatch` must not use `--event Created` — the rename from temp file doesn't trigger a Created event
+- **macOS floating thumbnail delays disk write by ~5 seconds.** When the floating screenshot thumbnail is enabled (default in macOS Mojave+), the OS holds the screenshot in memory and only writes the file to disk after the thumbnail dismisses (timeout or user click). This is the dominant source of perceived latency — the script itself runs in ~100ms once the file lands. Users who want instant clipboard updates need to disable the thumbnail (`Cmd+Shift+5` → Options → uncheck "Show Floating Thumbnail") or click it to dismiss on demand. This is documented in the README under "Still feels slow?".

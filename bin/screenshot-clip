@@ -39,6 +39,11 @@ wait_for_stable_file() {
 
 echo "screenshot-clip: Watching $WATCH_DIR for new screenshots..."
 
+# fswatch fires multiple events per screenshot (rename + xattr writes + Spotlight touch).
+# Dedup by filename+mtime so we only copy once per actual screenshot.
+last_file=""
+last_mtime=""
+
 fswatch -0 "$WATCH_DIR" | while IFS= read -r -d '' file; do
     filename=$(basename "$file")
     # Skip hidden files (macOS creates temp .Screenshot files before renaming)
@@ -46,6 +51,12 @@ fswatch -0 "$WATCH_DIR" | while IFS= read -r -d '' file; do
         continue
     fi
     if [[ "$filename" == *.png ]]; then
+        mtime=$(stat -f %m "$file" 2>/dev/null) || continue
+        if [[ "$filename" == "$last_file" && "$mtime" == "$last_mtime" ]]; then
+            continue
+        fi
+        last_file="$filename"
+        last_mtime="$mtime"
         wait_for_stable_file "$file"
         osascript -e "set the clipboard to (read (POSIX file \"$file\") as «class PNGf»)" 2>/dev/null
         if [[ $? -eq 0 ]]; then
