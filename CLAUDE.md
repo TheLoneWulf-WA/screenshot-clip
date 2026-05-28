@@ -10,7 +10,7 @@ screenshot-clip is a macOS-only shell utility that automatically copies screensh
 
 Three shell scripts, no build step:
 
-- **`bin/screenshot-clip`** — Main loop. Uses `fswatch` to watch a directory for new `.png` files, then copies each to the clipboard via `osascript`. Skips hidden files (macOS creates temp `.Screenshot` files before renaming to the final name). Configured via `SCREENSHOT_CLIP_DIR` (default `~/Desktop`) and `SCREENSHOT_CLIP_DELAY` (default `0.3s`).
+- **`bin/screenshot-clip`** — Main loop. Uses `fswatch` to watch a directory for new `.png` files, then copies each to the clipboard via `osascript`. Skips hidden files (macOS creates temp `.Screenshot` files before renaming to the final name). Waits for the file to finish writing by polling `stat -f %z` every 50ms until the size is stable across two consecutive reads (capped by `SCREENSHOT_CLIP_DELAY`, default `2.0s`). Configured via `SCREENSHOT_CLIP_DIR` (default `~/Desktop`) and `SCREENSHOT_CLIP_DELAY` (max wait timeout).
 - **`bin/screenshot-clip-install`** — Generates and loads a macOS `launchd` plist (`~/Library/LaunchAgents/com.screenshotclip.agent.plist`) so the watcher runs at login. Accepts an optional directory argument. Sets PATH in the plist so `fswatch` is found by launchd.
 - **`bin/screenshot-clip-uninstall`** — Unloads and removes the launchd plist.
 - **`Formula/screenshot-clip.rb`** — Homebrew formula (tap: `TheLoneWulf-WA/tools`). Depends on `fswatch`.

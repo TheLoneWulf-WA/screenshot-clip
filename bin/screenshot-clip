@@ -4,12 +4,38 @@
 # https://github.com/TheLoneWulf-WA/screenshot-clip
 
 WATCH_DIR="${SCREENSHOT_CLIP_DIR:-$HOME/Desktop}"
-SLEEP_DURATION="${SCREENSHOT_CLIP_DELAY:-0.3}"
+MAX_WAIT="${SCREENSHOT_CLIP_DELAY:-2.0}"
+POLL_INTERVAL=0.05
 
 if ! command -v fswatch &> /dev/null; then
     echo "Error: fswatch is required. Install it with: brew install fswatch"
     exit 1
 fi
+
+# Poll the file size until it stops growing, so we copy the fully-flushed
+# PNG instead of guessing how long the write takes.
+wait_for_stable_file() {
+    local file="$1"
+    local prev_size=-1
+    local stable=0
+    local iter=0
+    local size
+    local max_iter
+    max_iter=$(awk -v m="$MAX_WAIT" -v p="$POLL_INTERVAL" 'BEGIN{ printf "%d", m/p }')
+
+    while (( iter < max_iter )); do
+        size=$(stat -f %z "$file" 2>/dev/null) || return
+        if (( size > 0 )) && [[ "$size" == "$prev_size" ]]; then
+            ((stable++))
+            (( stable >= 2 )) && return
+        else
+            stable=0
+        fi
+        prev_size=$size
+        sleep "$POLL_INTERVAL"
+        ((iter++))
+    done
+}
 
 echo "screenshot-clip: Watching $WATCH_DIR for new screenshots..."
 
@@ -20,7 +46,7 @@ fswatch -0 "$WATCH_DIR" | while IFS= read -r -d '' file; do
         continue
     fi
     if [[ "$filename" == *.png ]]; then
-        sleep "$SLEEP_DURATION"
+        wait_for_stable_file "$file"
         osascript -e "set the clipboard to (read (POSIX file \"$file\") as «class PNGf»)" 2>/dev/null
         if [[ $? -eq 0 ]]; then
             echo "Copied to clipboard: $filename"

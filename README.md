@@ -78,7 +78,7 @@ No Electron. No Swift app. No daemon eating your RAM. A few lines of shell doing
 | Environment variable | Default | Description |
 |---|---|---|
 | `SCREENSHOT_CLIP_DIR` | `~/Desktop` | Folder to watch |
-| `SCREENSHOT_CLIP_DELAY` | `0.3` | Seconds to wait before copying (lets file finish writing) |
+| `SCREENSHOT_CLIP_DELAY` | `2.0` | Max seconds to wait for the file to finish writing before copying (poll-based; returns as soon as the file size is stable) |
 
 ## Why not just use Cmd + Ctrl + Shift + 4?
 
