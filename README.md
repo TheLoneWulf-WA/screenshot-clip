@@ -35,6 +35,41 @@ screenshot-clip-install
 
 Done. It runs in the background and starts automatically on login.
 
+### Installing via an AI agent
+
+The whole install is three non-interactive commands — no prompts, no Y/N, no manual steps. If you'd rather have Claude Code, Cursor, Codex, or another coding agent set it up for you, paste this prompt:
+
+> Install `screenshot-clip` on macOS and verify it's running.
+>
+> ```bash
+> brew tap TheLoneWulf-WA/tools && brew install screenshot-clip && screenshot-clip-install
+> launchctl list | grep com.screenshotclip.agent
+> ```
+>
+> The last command should print a line containing `com.screenshotclip.agent` if the background agent loaded successfully.
+
+## What it actually touches
+
+Worth knowing before you let anything — human or agent — install a background process on your machine.
+
+screenshot-clip:
+
+- **Reads** new `.png` files in the watched directory (default `~/Desktop`)
+- **Writes** PNG bytes to the macOS system clipboard via `osascript`
+- **Creates** one launchd agent plist at `~/Library/LaunchAgents/com.screenshotclip.agent.plist`
+- **Logs to** `/tmp/screenshot-clip.log` and `/tmp/screenshot-clip.err`
+
+And it does *not*:
+
+- **Touch the network.** Nothing leaves your machine. No telemetry, no analytics, no remote calls.
+- **Read credentials.** No keychain access, no tokens, no passwords.
+- **Read files outside the watch directory.** It only sees what `fswatch` fires for in `~/Desktop` (or wherever you configured).
+- **Run with elevated permissions.** The launchd agent runs as you, not as root.
+
+The whole thing is one shell script you can read in 30 seconds: [`bin/screenshot-clip`](bin/screenshot-clip).
+
+> **A note on Homebrew:** installing via `brew` gives you tarball integrity (sha256 verification of the source) and easy uninstall. It does *not* audit or sandbox what a formula does — what you see above applies whether you install via brew or run the scripts directly. Always read what you install.
+
 ## Usage
 
 Just screenshot normally with `Cmd + Shift + 4` (or `Cmd + Shift + 3`). The image is on your clipboard within a fraction of a second. From there:
