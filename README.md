@@ -82,19 +82,32 @@ No Electron. No Swift app. No daemon eating your RAM. A few lines of shell doing
 
 > **Upgrading from ≤ v1.0.2?** The `SCREENSHOT_CLIP_DELAY` default changed from `0.3` to `2.0`, and its meaning shifted from "always wait this long" to "max wait, return as soon as the file is stable." If you pinned it to a low value (e.g. `0.1`), unset it or raise it.
 
-## Still feels slow? Disable the floating thumbnail.
+## Still feels like nothing's happening?
 
-If screenshots take ~3-5 seconds to land on your clipboard, it's not screenshot-clip — it's macOS. When the floating thumbnail is enabled (the preview that appears in the bottom-right corner after each screenshot), **macOS holds the screenshot in memory and doesn't write the file to disk until the thumbnail dismisses.** screenshot-clip can't copy what isn't on disk yet.
+If you take a screenshot and your clipboard sits there empty for 3+ seconds, it's not screenshot-clip being slow — it's macOS playing keep-away with the file.
 
-To make screenshots land on your clipboard instantly:
+When the floating thumbnail is enabled (that little preview that pops up in the bottom-right after every screenshot), macOS holds the screenshot in memory and only writes the file to disk *after* the thumbnail dismisses. screenshot-clip can't copy what isn't on disk yet, so it ends up waiting on macOS to let go.
 
-1. Press `Cmd + Shift + 5`
+**The numbers:**
+
+| Setup | Time from screenshot to clipboard |
+|---|---|
+| Thumbnail enabled (default) | ~3–5 seconds |
+| Thumbnail enabled, you click it to dismiss | ~200ms after click |
+| Thumbnail disabled | ~100–200ms (feels instant) |
+
+**To disable the thumbnail:**
+
+1. `Cmd + Shift + 5`
 2. Click **Options**
 3. Uncheck **Show Floating Thumbnail**
 
-Now screenshots write to disk immediately and screenshot-clip copies in ~100ms.
+**One caveat:** the thumbnail isn't *just* a wait. It's also the entry point to macOS Markup — you click it to draw on the screenshot, add arrows, redact stuff, etc. If you actually use that workflow, don't disable it. Two alternatives:
 
-If you want to keep the thumbnail (it's useful for inline annotation), just single-click it after taking a screenshot — that dismisses the preview and writes the file on demand.
+- **Keep the thumbnail on, click it the moment it appears.** Clicking dismisses *and* writes the file, so your clipboard fills fast and you can still annotate from Finder later.
+- **Keep the thumbnail on, live with the wait.** The clipboard will catch up — it just feels less magical.
+
+If you don't use macOS annotation (honestly, most people don't), turn the thumbnail off and forget about it.
 
 ## Why not just use Cmd + Ctrl + Shift + 4?
 
