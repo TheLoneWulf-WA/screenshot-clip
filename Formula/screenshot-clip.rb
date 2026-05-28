@@ -1,8 +1,8 @@
 class ScreenshotClip < Formula
   desc "Auto-copy macOS screenshots to your clipboard instantly"
   homepage "https://github.com/TheLoneWulf-WA/screenshot-clip"
-  url "https://github.com/TheLoneWulf-WA/screenshot-clip/archive/refs/tags/v1.0.3.tar.gz"
-  sha256 "e1feb14f27a6e2b4a92299f26e5d272900cb21cf1c90df97bf0f70fa4b6c6d62"
+  url "https://github.com/TheLoneWulf-WA/screenshot-clip/archive/refs/tags/v1.0.4.tar.gz"
+  sha256 "6d9074ef99aadcc536e8cba0b5475af67af5b3bdb8531da2775eeffa84f88c2e"
   license "MIT"
 
   depends_on :macos
