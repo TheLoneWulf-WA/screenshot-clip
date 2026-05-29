@@ -6,17 +6,17 @@ Take a screenshot, paste it anywhere. No extra steps.
 
 ## The problem
 
-You screenshot something — a design on Dribbble, a bug on a live site, a UI pattern, an error message. On macOS, that screenshot lands as a file on your Desktop. To actually use it, you need to find the file, click on it, `Cmd + C` to copy, then `Cmd + V` to paste where you need it. It's not hard — but it's extra steps, and when you're screenshotting dozens of times a day, those steps add up.
+You screenshot something: a design on Dribbble, a bug on a live site, a UI pattern, an error message. On macOS, that screenshot lands as a file on your Desktop. To actually use it, you need to find the file, click on it, `Cmd + C` to copy, then `Cmd + V` to paste where you need it. It's not hard, but it's extra steps, and when you're screenshotting dozens of times a day, those steps add up.
 
 screenshot-clip eliminates the middle. The moment a screenshot is taken, it's on your clipboard. Just paste.
 
 This friction compounds depending on how you work:
 
-**With AI agents:** You're screenshotting reference material to feed into Claude Code, Cursor, or Copilot. A design you want replicated, an error you want debugged, a UI you want built. The screenshot-find-copy-paste loop happens constantly. Tools like Playwright and Chrome DevTools MCP can already see what's in your editor or browser — but when you want to show the agent something from *another* screen, a different app, or a physical reference, you need to screenshot it and bring it in yourself. That's where this comes in.
+**With AI agents:** You're screenshotting reference material to feed into Claude Code, Cursor, or Copilot. A design you want replicated, an error you want debugged, a UI you want built. The screenshot-find-copy-paste loop happens constantly. Tools like Playwright and Chrome DevTools MCP can already see what's in your editor or browser, but when you want to show the agent something from *another* screen, a different app, or a physical reference, you need to screenshot it and bring it in yourself. That's where this comes in.
 
-**With clipboard managers like Raycast:** This is where the workflow gets powerful. Take several screenshots in a row — a design, some reference text, an error — knowing each one is automatically copied to your clipboard. They all stack up in your clipboard history. Then pull them out one by one, pasting each exactly where it's needed. No file hunting, no interruption, just screenshot and keep moving.
+**With clipboard managers like Raycast:** This is where the workflow gets powerful. Take several screenshots in a row (a design, some reference text, an error), knowing each one is automatically copied to your clipboard. They all stack up in your clipboard history. Then pull them out one by one, pasting each exactly where it's needed. No file hunting, no interruption, just screenshot and keep moving.
 
-**Across Apple ecosystem:** macOS screenshots land on your Desktop as files. With screenshot-clip, they also land on your clipboard instantly. Paste into iMessage, AirDrop context to your iPhone, drop it into Notes — the image is ready the moment you capture it.
+**Across Apple ecosystem:** macOS screenshots land on your Desktop as files. With screenshot-clip, they also land on your clipboard instantly. Paste into iMessage, AirDrop context to your iPhone, drop it into Notes. The image is ready the moment you capture it.
 
 screenshot-clip removes the middle steps. Screenshot, paste. That's it.
 
@@ -37,7 +37,7 @@ Done. It runs in the background and starts automatically on login.
 
 ### Installing via an AI agent
 
-The whole install is three non-interactive commands — no prompts, no Y/N, no manual steps. If you'd rather have Claude Code, Cursor, Codex, or another coding agent set it up for you, paste this prompt:
+The whole install is three non-interactive commands. No prompts, no Y/N, no manual steps. If you'd rather have Claude Code, Cursor, Codex, or another coding agent set it up for you, paste this prompt:
 
 > Install `screenshot-clip` on macOS and verify it's running.
 >
@@ -50,7 +50,7 @@ The whole install is three non-interactive commands — no prompts, no Y/N, no m
 
 ## What it actually touches
 
-Worth knowing before you let anything — human or agent — install a background process on your machine.
+Worth knowing before you let anything, human or agent, install a background process on your machine.
 
 screenshot-clip:
 
@@ -68,15 +68,15 @@ And it does *not*:
 
 The whole thing is one shell script you can read in 30 seconds: [`bin/screenshot-clip`](bin/screenshot-clip).
 
-> **A note on Homebrew:** installing via `brew` gives you tarball integrity (sha256 verification of the source) and easy uninstall. It does *not* audit or sandbox what a formula does — what you see above applies whether you install via brew or run the scripts directly. Always read what you install.
+> **A note on Homebrew:** installing via `brew` gives you tarball integrity (sha256 verification of the source) and easy uninstall. It does *not* audit or sandbox what a formula does. What you see above applies whether you install via brew or run the scripts directly. Always read what you install.
 
 ## Usage
 
 Just screenshot normally with `Cmd + Shift + 4` (or `Cmd + Shift + 3`). The image is on your clipboard within a fraction of a second. From there:
 
-- **Paste on your Mac** — `Cmd + V` into Claude Code, Slack, Figma, a browser chat, Notes, wherever.
-- **Paste on your iPhone/iPad** — Apple's Universal Clipboard means your Mac clipboard is available on your other devices. Screenshot on your Mac, paste on your iPhone. No AirDrop, no file sharing.
-- **Stack screenshots with a clipboard manager** — if you use Raycast or similar, each screenshot automatically enters your clipboard history. Take several in a row, then pull them out one by one wherever you need them.
+- **Paste on your Mac.** `Cmd + V` into Claude Code, Slack, Figma, a browser chat, Notes, wherever.
+- **Paste on your iPhone/iPad.** Apple's Universal Clipboard means your Mac clipboard is available on your other devices. Screenshot on your Mac, paste on your iPhone. No AirDrop, no file sharing.
+- **Stack screenshots with a clipboard manager.** If you use Raycast or similar, each screenshot automatically enters your clipboard history. Take several in a row, then pull them out one by one wherever you need them.
 
 ### Custom screenshot folder
 
@@ -102,9 +102,9 @@ cat /tmp/screenshot-clip.log
 
 A background process on your Mac watches your Desktop folder. Every time a new PNG file appears (which is what happens when you take a screenshot), it automatically copies that image to your clipboard. Three components, all lightweight:
 
-1. **fswatch** — an open-source tool that monitors your screenshot folder for new files in real time. This is what makes it fast (faster than macOS Automator Folder Actions).
-2. **screenshot-clip** — a shell script that detects new `.png` files and copies them to your clipboard using macOS native `osascript`.
-3. **A launchd agent** — a plist configuration file that tells macOS "run this script automatically when I log in, and keep it running." This is how macOS handles background services for your user account, similar to a startup item.
+1. **fswatch.** An open-source tool that monitors your screenshot folder for new files in real time. This is what makes it fast (faster than macOS Automator Folder Actions).
+2. **screenshot-clip.** A shell script that detects new `.png` files and copies them to your clipboard using macOS native `osascript`.
+3. **A launchd agent.** A plist configuration file that tells macOS "run this script automatically when I log in, and keep it running." This is how macOS handles background services for your user account, similar to a startup item.
 
 No Electron. No Swift app. No daemon eating your RAM. A few lines of shell doing one thing well.
 
@@ -119,7 +119,7 @@ No Electron. No Swift app. No daemon eating your RAM. A few lines of shell doing
 
 ## Still feels like nothing's happening?
 
-If you take a screenshot and your clipboard sits there empty for 3+ seconds, it's not screenshot-clip being slow — it's macOS playing keep-away with the file.
+If you take a screenshot and your clipboard sits there empty for 3+ seconds, it's not screenshot-clip being slow. It's macOS playing keep-away with the file.
 
 When the floating thumbnail is enabled (that little preview that pops up in the bottom-right after every screenshot), macOS holds the screenshot in memory and only writes the file to disk *after* the thumbnail dismisses. screenshot-clip can't copy what isn't on disk yet, so it ends up waiting on macOS to let go.
 
@@ -137,10 +137,10 @@ When the floating thumbnail is enabled (that little preview that pops up in the 
 2. Click **Options**
 3. Uncheck **Show Floating Thumbnail**
 
-**One caveat:** the thumbnail isn't *just* a wait. It's also the entry point to macOS Markup — you click it to draw on the screenshot, add arrows, redact stuff, etc. If you actually use that workflow, don't disable it. Two alternatives:
+**One caveat:** the thumbnail isn't *just* a wait. It's also the entry point to macOS Markup, where you click it to draw on the screenshot, add arrows, redact stuff, etc. If you actually use that workflow, don't disable it. Two alternatives:
 
 - **Keep the thumbnail on, click it the moment it appears.** Clicking dismisses *and* writes the file, so your clipboard fills fast and you can still annotate from Finder later.
-- **Keep the thumbnail on, live with the wait.** The clipboard will catch up — it just feels less magical.
+- **Keep the thumbnail on, live with the wait.** The clipboard will catch up. It just feels less magical.
 
 If you don't use macOS annotation (honestly, most people don't), turn the thumbnail off and forget about it.
 
